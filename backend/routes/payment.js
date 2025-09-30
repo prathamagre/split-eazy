@@ -1,15 +1,26 @@
-const express =  require('express');
+const express = require('express');
 const router = express.Router();
-const{addRecord, getAllRecords, editRecord, deleteRecord, settlement} = require('../controllers/paymentController')
+const { addRecord, getAllRecords, editRecord, deleteRecord, settlement } = require('../controllers/paymentController');
 
-router.post('/add', addRecord);
+// Add a payment record
+router.post('/addRecord', addRecord);
 
-router.post('/getAll', getAllRecords);
+// Get all payment records for a listing
+router.post('/getAllRecords', getAllRecords);
 
-router.post('/edit/:id', editRecord);
+// Edit a payment record
+router.post('/editRecord/:id', editRecord);
 
-router.post('/delete/:id', deleteRecord);
+// Delete a payment record (we take paymentID from body and map to req.params)
+router.post('/deleteRecord', (req, res) => {
+    req.params.id = req.body.paymentID;
+    deleteRecord(req, res);
+});
 
-router.post('/settlement/:listingID', settlement);
+// Settlement calculation (we take listingID from body and map to req.params)
+router.post('/settlement', (req, res) => {
+    req.params.listingID = req.body.listingID;
+    settlement(req, res);
+});
 
 module.exports = router;
