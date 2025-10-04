@@ -8,6 +8,6 @@ router.get('/', getAllListings);
 
 router.post('/edit/:id', editListings);
 
-router.post('/delete/:id', deleteListings);
+router.delete('/delete/:id', deleteListings);
 
 module.exports = router;
