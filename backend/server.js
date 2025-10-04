@@ -7,7 +7,11 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: '*' }));
+app.use(cors({
+    origin: 'https://spliteasy1.netlify.app', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 
 app.use(express.json());
 
