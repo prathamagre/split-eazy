@@ -54,13 +54,15 @@ exports.editRecord = async (req, res) => {
 // ✅ Delete a payment record
 exports.deleteRecord = async (req, res) => {
     try {
-        const payment = await Payment.findByIdAndDelete(req.params.id);
-        if (!payment) return res.status(404).json({ status: 'failure', message: 'Payment not found' });
-        res.status(200).json({ status: 'success', message: 'Payment deleted' });
+      const payment = await Payment.findByIdAndDelete(req.params.id);
+      if (!payment)
+        return res.status(404).json({ status: 'failure', message: 'Payment not found' });
+  
+      res.status(200).json({ status: 'success', message: 'Payment deleted' });
     } catch (err) {
-        res.status(500).json({ status: 'failure', message: err.message });
+      res.status(500).json({ status: 'failure', message: err.message });
     }
-};
+  };
 
 exports.settlement = async (req, res) => {
     try {

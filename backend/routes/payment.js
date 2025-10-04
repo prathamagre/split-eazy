@@ -12,10 +12,7 @@ router.post('/getAllRecords', getAllRecords);
 router.post('/editRecord/:id', editRecord);
 
 // Delete a payment record (we take paymentID from body and map to req.params)
-router.post('/deleteRecord', (req, res) => {
-    req.params.id = req.body.paymentID;
-    deleteRecord(req, res);
-});
+router.delete('/deleteRecord/:id', deleteRecord);
 
 // Settlement calculation (we take listingID from body and map to req.params)
 router.post('/settlement', (req, res) => {
