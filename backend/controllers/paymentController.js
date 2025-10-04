@@ -62,10 +62,9 @@ exports.deleteRecord = async (req, res) => {
     }
 };
 
-// ✅ Settlement calculation
 exports.settlement = async (req, res) => {
     try {
-        const { listingID } = req.params;
+        const { listingID } = req.body; // <- use req.body
 
         // Fetch listing participants
         const listing = await Listing.findById(listingID);
@@ -76,23 +75,18 @@ exports.settlement = async (req, res) => {
         // Fetch all payments for this listing
         const payments = await Payment.find({ listingID });
 
-        // Track net balances for each participant
         const balance = {};
         participants.forEach(p => balance[p] = 0);
 
         payments.forEach(payment => {
             const splitAmount = payment.amount / payment.paidFor.length;
-
-            // payer contributes (positive)
             balance[payment.paidBy] += payment.amount;
 
-            // payees owe (negative)
             payment.paidFor.forEach(p => {
                 balance[p] -= splitAmount;
             });
         });
 
-        // Convert balance object into settlement transactions
         const settlements = [];
         const debtors = Object.entries(balance).filter(([_, amt]) => amt < 0);
         const creditors = Object.entries(balance).filter(([_, amt]) => amt > 0);
@@ -103,28 +97,24 @@ exports.settlement = async (req, res) => {
             let [creditor, creditAmt] = creditors[j];
 
             debtAmt = Math.abs(debtAmt);
-
             const settledAmount = Math.min(debtAmt, creditAmt);
 
-            settlements.push({
-                from: debtor,
-                to: creditor,
-                amount: settledAmount
-            });
+            settlements.push([debtor, creditor, settledAmount]); // <- array for frontend
 
             debtAmt -= settledAmount;
             creditAmt -= settledAmount;
 
             if (debtAmt === 0) i++;
-            else debtors[i][1] = -debtAmt; // update remaining debt
+            else debtors[i][1] = -debtAmt;
 
             if (creditAmt === 0) j++;
-            else creditors[j][1] = creditAmt; // update remaining credit
+            else creditors[j][1] = creditAmt;
         }
 
-        res.status(200).json({ status: 'success', settlements });
+        res.status(200).json({ status: 'success', settlement: settlements }); // <- key name `settlement`
 
     } catch (err) {
         res.status(500).json({ status: 'failure', message: err.message });
     }
 };
+
